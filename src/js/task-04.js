@@ -1,16 +1,50 @@
-const counterValue = 1;
+const CounterPlugin = function ({
+    rootSelector,
+    counterValue = 0, 
+    step = 1,
+} = {}){
+   this._value = counterValue;
+   this._step = step;
 
-const CounterPlugin = function({initialValue = 0, step = 1} = {}){
-   this._value = initialValue;
+   this._refs = this._getRefs(rootSelector);
+
+   this._bindEvents();
+   this.updateCounterValueUI();
 };
 
-const counter = new CounterPlugin();
+CounterPlugin.prototype._getRefs = function (rootSelector) {
+  const refs = {};
+  refs.container = document.querySelector(rootSelector);
+  refs.incrementBtn = refs.container.querySelector('[data-action = increment]');
+  refs.decrementBtn = refs.container.querySelector('[data-action = decrement]');
+  refs.value = refs.container.querySelector('span');
 
-// increment 
-// decrement 
+  return refs;
+};
 
-/* <div id="counter">
-  <button type="button" data-action="decrement">-1</button>
-  <span id="value">0</span>
-  <button type="button" data-action="increment">+1</button>
-</div> */
+CounterPlugin.prototype._bindEvents = function(){
+    this._refs.incrementBtn.addEventListener('click', () => {
+        this.increment();
+        this.updateCounterValueUI();
+    });
+
+    this._refs.decrementBtn.addEventListener('click', () => {
+        this.decrement();
+        this.updateCounterValueUI();
+    })
+};
+
+CounterPlugin.prototype.updateCounterValueUI = function(){
+    this._refs.value.textContent = this._value;  
+};
+
+CounterPlugin.prototype.increment = function(){
+   this._value += this._step;
+};
+
+CounterPlugin.prototype.decrement = function(){
+    this._value -= this._step;
+ };
+
+const counterValue = new CounterPlugin({ rootSelector: '#counter', step: 1 });
+
